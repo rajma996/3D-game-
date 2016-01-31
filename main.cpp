@@ -6,6 +6,14 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#define helicopter 1
+#define towerview 2
+#define topview 3
+#define followup 4
+#define xplus 1
+#define yplus 2
+#define xminus 3
+#define yminus 4
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -16,15 +24,45 @@
 
 using namespace std;
 
-
+float x1,y,z;
+typedef struct heli
+{
+	float ang;
+	float dis;
+}heli;
+heli helic;
+float view_state ;
+struct VAO {
+    GLuint VertexArrayID;
+    GLuint VertexBuffer;
+    GLuint ColorBuffer;
+    GLenum PrimitiveMode;
+    GLenum FillMode;
+    int NumVertices;
+};
+typedef struct VAO VAO;
+typedef struct player_s
+{
+  int boardx,boardy;
+  vector<VAO> v;
+}player_s;
+typedef struct board
+{
+  float x,y,z;
+  vector<float>  dim ;
+  VAO v;
+}board;
+VAO water;
+player_s player;
+board game_board[20][20];
 #include "construct3D.h"
 #include "cube.h"
 #include "board.h"
-
+#include "player.h"
 
 bool keys[500];
 /* Function to load Shaders - Use it as it is */
-GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path) {
+	GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path) {
 
 	// Create the shaders
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -122,9 +160,17 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 
     if (action == GLFW_RELEASE) {
         switch (key) {
-
+					case GLFW_KEY_R:
+						keys[GLFW_KEY_R]=0;
+								break;
+					case GLFW_KEY_H :
+						keys[GLFW_KEY_H]=0;
+								break;
             case GLFW_KEY_X:
 							keys[GLFW_KEY_X]=0;
+									break;
+						case GLFW_KEY_F:
+							keys[GLFW_KEY_F]=0;
 									break;
 						case GLFW_KEY_A:
 							keys[GLFW_KEY_A]=0;
@@ -135,13 +181,30 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 						case GLFW_KEY_C:
 							keys[GLFW_KEY_C]=0;
 									break;
-
             case GLFW_KEY_Y:
                 keys[GLFW_KEY_Y]=0;
                 break;
             case GLFW_KEY_Z:
                 keys[GLFW_KEY_Z]=0;
+								if(keys[GLFW_KEY_LEFT_SHIFT]) helic.dis+=0.1;
+								else  helic.dis-=0.1;
                 break;
+						case GLFW_KEY_UP:
+								move_player_xp();
+								break;
+						case GLFW_KEY_DOWN:
+								move_player_xm();
+                break;
+						case GLFW_KEY_LEFT:
+								move_player_yp();
+								break;
+						case GLFW_KEY_RIGHT:
+								move_player_ym();
+                break;
+						case GLFW_KEY_LEFT_SHIFT:
+							keys[GLFW_KEY_LEFT_SHIFT]=0;
+							break;
+
             default:
                 break;
         }
@@ -150,26 +213,48 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
         switch (key) {
             case GLFW_KEY_ESCAPE:
                 quit(window);
-                break;
+              break;
+							case GLFW_KEY_R:
+								keys[GLFW_KEY_R]=1;
+								break;
+							case GLFW_KEY_H :
+								keys[GLFW_KEY_H]=1;
+								if(GLFW_KEY_LEFT_SHIFT) view_state = helicopter;
+								break;
+							case GLFW_KEY_F:
+								keys[GLFW_KEY_F]=1;
+								if(GLFW_KEY_LEFT_SHIFT) view_state = followup;
+										break;
+
             case GLFW_KEY_X:
               keys[GLFW_KEY_X]=1;
               break;
-                          case GLFW_KEY_Y:
+						case GLFW_KEY_T:
+							keys[GLFW_KEY_T]=1;
+							if(GLFW_KEY_LEFT_SHIFT) view_state = towerview;
+							break;
+						case GLFW_KEY_O:
+							keys[GLFW_KEY_O]=1;
+							if(GLFW_KEY_LEFT_SHIFT) view_state = topview;
+							break;
+            case GLFW_KEY_Y:
               keys[GLFW_KEY_Y]=1;
               break;
             case GLFW_KEY_Z:
               keys[GLFW_KEY_Z]=1;
               break;
-							case GLFW_KEY_A:
-								keys[GLFW_KEY_A]=1;
-										break;
-							case GLFW_KEY_B:
-								keys[GLFW_KEY_B]=1;
-										break;
-							case GLFW_KEY_C:
-								keys[GLFW_KEY_C]=1;
-										break;
-
+						case GLFW_KEY_A:
+							keys[GLFW_KEY_A]=1;
+									break;
+						case GLFW_KEY_B:
+							keys[GLFW_KEY_B]=1;
+									break;
+						case GLFW_KEY_C:
+							keys[GLFW_KEY_C]=1;
+									break;
+							case GLFW_KEY_LEFT_SHIFT:
+								keys[GLFW_KEY_LEFT_SHIFT]=1;
+								break;
             default:
                 break;
         }
@@ -236,6 +321,7 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
 void draw ()
 {
   // clear the color and depth in the frame buffer
+	if(keys[GLFW_KEY_R]) helic.ang++;
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // printf("%f %f %f\n",x,y,z );
   // use the loaded shader program
@@ -262,7 +348,9 @@ void draw ()
   // For each model you render, since the MVP will be different (at least the M part)
   //  Don't change unless you are sure!!
   glm::mat4 MVP;	// MVP = Projection * View * Model
-	loop(i,0,board.size()) construct(board[i]);
+	display_board();
+	display_player();
+	construct(water);
   // Load identity to model matrix
 
   // draw3DObject draws the VAO given to it using current MVP matrix
@@ -323,6 +411,12 @@ void initGL (GLFWwindow* window, int width, int height)
     /* Objects should be created before any other gl function and shaders */
 	// Create the models
 	// Create and compile our GLSL program from the shaders
+	set_board();
+	init_player();
+	view_state = helicopter;
+	helic.ang = 0;
+	helic.dis = 1;
+	x1=-1;y=-1;z=1;
 	programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
 	// Get a handle for our "MVP" uniform
 	Matrices.MatrixID = glGetUniformLocation(programID, "MVP");
@@ -345,8 +439,8 @@ void initGL (GLFWwindow* window, int width, int height)
 
 int main (int argc, char** argv)
 {
-	int width = 600;
-	int height = 600;
+	int width = 700;
+	int height = 700;
 
     GLFWwindow* window = initGLFW(width, height);
 

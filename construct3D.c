@@ -77,11 +77,27 @@ void draw3DObject (struct VAO* vao)
 void construct(VAO x)
 {
   glUseProgram (programID);
-  glm::vec3 eye ( 5*cos(camera_rotation_angle*M_PI/180.0f), 0, 5*sin(camera_rotation_angle*M_PI/180.0f) );
-  glm::vec3 target (0, 0, 0);
-  glm::vec3 up (0, 1, 0);
-  Matrices.view = glm::lookAt(glm::vec3(0,0,0), glm::vec3(0,0,0), glm::vec3(0,1,0)); // Fixed camera for 2D (ortho) in XY plane
-  Matrices.projection = glm::ortho(-30.0f,30.0f,-30.0f,30.0f, 0.1f, 500.0f);
+  float xt = game_board[player.boardx][player.boardy].x,yt=game_board[player.boardx][player.boardy].y,player,zt=game_board[1][1].z+game_board[1][1].dim[5]+2;
+  if(view_state==helicopter)
+  {
+    Matrices.view = glm::lookAt(glm::vec3(5*cos(helic.ang*M_PI/180),5*sin(helic.ang*M_PI/180),10), glm::vec3(0,0,7), glm::vec3(0,0,1));
+    Matrices.projection = glm::ortho(-25.0f*helic.dis, 25.0f*helic.dis,-25.0f*helic.dis,25.0f*helic.dis, -500.0f, 500.0f);
+  }
+  else if(view_state==towerview)
+  {
+    Matrices.view = glm::lookAt(glm::vec3(game_board[10][10].x,game_board[10][10].y,11), glm::vec3(0,0,-5), glm::vec3(0,0,1));
+    Matrices.projection = glm::ortho(-15.0f, 15.0f,-15.0f,15.0f, -500.0f, 500.0f);
+  }
+  else if(view_state==topview)
+  {
+    Matrices.view = glm::lookAt(glm::vec3(1.5,1.5,11), glm::vec3(0,0,0), glm::vec3(0,0,1));
+    Matrices.projection = glm::ortho(-20.0f, 20.0f,-20.0f,20.0f, -500.0f, 500.0f);
+  }
+  else if(view_state==followup)
+  {
+    Matrices.view = glm::lookAt(glm::vec3(xt+0.5,yt,zt+0.5), glm::vec3(xt,yt,zt), glm::vec3(0,0,1));
+    Matrices.projection = glm::ortho(-10.0f, 10.0f,-10.0f,10.0f, -500.0f, 500.0f);
+  }
   glm::mat4 VP = Matrices.projection * Matrices.view;
   glm::mat4 MVP;	// MVP = Projection * View * Model
   Matrices.model = glm::mat4(1.0f);

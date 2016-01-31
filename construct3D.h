@@ -5,15 +5,6 @@
 GLuint programID;
 float camera_rotation_angle = 90;
 
-struct VAO {
-    GLuint VertexArrayID;
-    GLuint VertexBuffer;
-    GLuint ColorBuffer;
-    GLenum PrimitiveMode;
-    GLenum FillMode;
-    int NumVertices;
-};
-typedef struct VAO VAO;
 
 struct GLMatrices {
 
