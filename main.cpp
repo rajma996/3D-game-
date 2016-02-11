@@ -1,3 +1,4 @@
+#include <bits/stdc++.h>
 #include <iostream>
 #include <cmath>
 #include <math.h>
@@ -14,6 +15,9 @@
 #define yplus 2
 #define xminus 3
 #define yminus 4
+#define sleeping_x 1
+#define sleeping_y 2
+#define standing 3
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -31,7 +35,9 @@ typedef struct heli
 	float dis;
 }heli;
 heli helic;
-float view_state ;
+int view_state ;
+int player_state;
+int player_sleep = standing;
 struct VAO {
     GLuint VertexArrayID;
     GLuint VertexBuffer;
@@ -43,7 +49,7 @@ struct VAO {
 typedef struct VAO VAO;
 typedef struct player_s
 {
-  int boardx,boardy;
+  int boardx,boardy,boardx1,boardy1;
   vector<VAO> v;
 }player_s;
 typedef struct board
@@ -54,7 +60,8 @@ typedef struct board
 }board;
 VAO water;
 player_s player;
-board game_board[20][20];
+board game_board[45][45];
+#include "level.h"
 #include "construct3D.h"
 #include "cube.h"
 #include "board.h"
@@ -190,16 +197,16 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 								else  helic.dis-=0.1;
                 break;
 						case GLFW_KEY_UP:
-								move_player_xp();
+								move_player_up();
 								break;
 						case GLFW_KEY_DOWN:
-								move_player_xm();
+								move_player_down();
                 break;
 						case GLFW_KEY_LEFT:
-								move_player_yp();
+								move_player_left();
 								break;
 						case GLFW_KEY_RIGHT:
-								move_player_ym();
+								move_player_right();
                 break;
 						case GLFW_KEY_LEFT_SHIFT:
 							keys[GLFW_KEY_LEFT_SHIFT]=0;
@@ -225,7 +232,6 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 								keys[GLFW_KEY_F]=1;
 								if(GLFW_KEY_LEFT_SHIFT) view_state = followup;
 										break;
-
             case GLFW_KEY_X:
               keys[GLFW_KEY_X]=1;
               break;
@@ -411,10 +417,15 @@ void initGL (GLFWwindow* window, int width, int height)
     /* Objects should be created before any other gl function and shaders */
 	// Create the models
 	// Create and compile our GLSL program from the shaders
+	set_level0();
+
 	set_board();
+
 	init_player();
+
 	view_state = helicopter;
-	helic.ang = 0;
+	player_state = xplus;
+	helic.ang = 225;
 	helic.dis = 1;
 	x1=-1;y=-1;z=1;
 	programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
