@@ -2,11 +2,12 @@
 
 void set_board()
 {
+  lines.clear();
   loop(i,-19,21)
   {
     loop(j,-19,21)
     {
-      if(level[0].board[i+20][j+20]==1)
+      if(level[game_level].board[i+20][j+20]==1 )
       {
         float temp = 5;
         game_board[i+20][j+20].x=(4*(i-1)+2);game_board[i+20][j+20].y=(4*(j-1)+2);game_board[i+20][j+20].z=(0);
@@ -25,7 +26,9 @@ void display_board()
   {
     loop(j,-19,21)
     {
-      if(level[0].board[i+20][j+20]==1)
+      if(i+20==level[game_level].des.F && j+20==level[game_level].des.S) continue;
+
+      if(level[game_level].board[i+20][j+20]==1)
       construct(game_board[i+20][j+20].v);
     }
   }

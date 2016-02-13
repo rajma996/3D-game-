@@ -79,13 +79,14 @@ void construct(VAO x)
   float x_temp = (game_board[player.boardx][player.boardy].x+game_board[player.boardx1][player.boardy1].x)/2;
   float y_temp = (game_board[player.boardx][player.boardy].y+game_board[player.boardx1][player.boardy1].y)/2;
   float z_temp;
+  if (player_sleep == sleeping_x || player_sleep==sleeping_y)  {  z_temp = game_board[player.boardx][player.boardy].z+game_board[player.boardx][player.boardy].dim[4]+2; }
+  else z_temp = game_board[player.boardx][player.boardy].z+game_board[player.boardx][player.boardy].dim[4]+4;
 
   glUseProgram (programID);
-  float xt = game_board[player.boardx][player.boardy].x,yt=game_board[player.boardx][player.boardy].y,player,zt=game_board[1][1].z+game_board[1][1].dim[5]+2;
   if(view_state==helicopter)
   {
     Matrices.view = glm::lookAt(glm::vec3(5*cos(helic.ang*M_PI/180)+x_temp,5*sin(helic.ang*M_PI/180)+y_temp,z_temp+10), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
-    Matrices.projection = glm::ortho(-25.0f*helic.dis, 25.0f*helic.dis,-25.0f*helic.dis,25.0f*helic.dis, -500.0f, 500.0f);
+    Matrices.projection = glm::ortho(-25.0f*helic.dis, 25.0f*helic.dis,-25.0f*helic.dis,25.0f*helic.dis, -1.0f, 500.0f);
   }
   else if(view_state==towerview)
   {
@@ -100,13 +101,13 @@ void construct(VAO x)
   else if(view_state==followup)
   {
     if(player_state==xplus)
-      Matrices.view = glm::lookAt(glm::vec3(xt-1,yt,zt+1), glm::vec3(xt,yt,zt), glm::vec3(0,0,1));
+      Matrices.view = glm::lookAt(glm::vec3(x_temp-1,y_temp,z_temp+1), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
     else if (player_state==xminus)
-      Matrices.view = glm::lookAt(glm::vec3(xt+0.5,yt,zt+0.5), glm::vec3(xt,yt,zt), glm::vec3(0,0,1));
+      Matrices.view = glm::lookAt(glm::vec3(x_temp+0.5,y_temp,z_temp+0.5), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
     else if(player_state==yplus)
-      Matrices.view = glm::lookAt(glm::vec3(xt,yt-0.5,zt+0.5), glm::vec3(xt,yt,zt), glm::vec3(0,0,1));
+      Matrices.view = glm::lookAt(glm::vec3(x_temp,y_temp-0.5,z_temp+0.5), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
     else if(player_state==yminus)
-      Matrices.view = glm::lookAt(glm::vec3(xt,yt+0.5,zt+0.5), glm::vec3(xt,yt,zt), glm::vec3(0,0,1));
+      Matrices.view = glm::lookAt(glm::vec3(x_temp,y_temp+0.5,z_temp+0.5), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
 
     Matrices.projection = glm::ortho(-20.0f, 20.0f,-20.0f,20.0f, -500.0f, 500.0f);
   }
