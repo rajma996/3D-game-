@@ -430,13 +430,13 @@ void initGL (GLFWwindow* window, int width, int height)
     /* Objects should be created before any other gl function and shaders */
 	// Create the models
 	// Create and compile our GLSL program from the shaders
-	game_level = 1;
+	game_level = 5;
 	set_levels();
 	set_board();
 	init_player();
 	view_state = helicopter;
 	player_state = xplus;
-	helic.ang = 0;
+	helic.ang = 340;
 	helic.dis = 1;
 	x1=-1;y=-1;z=1;
 	programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );

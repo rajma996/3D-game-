@@ -85,13 +85,14 @@ void construct(VAO x)
   glUseProgram (programID);
   if(view_state==helicopter)
   {
-    Matrices.view = glm::lookAt(glm::vec3(5*cos(helic.ang*M_PI/180)+x_temp,5*sin(helic.ang*M_PI/180)+y_temp,z_temp+10), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
+    Matrices.view = glm::lookAt(glm::vec3(5*cos(helic.ang*M_PI/180)+x_temp,5*sin(helic.ang*M_PI/180)+y_temp,z_temp+7), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
     Matrices.projection = glm::ortho(-25.0f*helic.dis, 25.0f*helic.dis,-25.0f*helic.dis,25.0f*helic.dis, -1.0f, 500.0f);
   }
   else if(view_state==towerview)
   {
-    Matrices.view = glm::lookAt(glm::vec3(game_board[10][10].x,game_board[10][10].y,11), glm::vec3(0,0,-5), glm::vec3(0,0,1));
-    Matrices.projection = glm::ortho(-15.0f, 15.0f,-15.0f,15.0f, -500.0f, 500.0f);
+
+    Matrices.view = glm::lookAt(glm::vec3(game_board[level[game_level].des.F][level[game_level].des.S].x,game_board[level[game_level].des.F][level[game_level].des.S].y,20), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
+    Matrices.projection = glm::perspective(1.57f,1.0f,1.0f,50.0f);
   }
   else if(view_state==topview)
   {
