@@ -36,13 +36,15 @@ void constplayer()
   if( level[game_level].board[player.boardx][player.boardy]==0 || level[game_level].board[player.boardx1][player.boardy1]==0)
   {
     if( level[game_level].board_light[player.boardx][player.boardy]==0 || level[game_level].board_light[player.boardx1][player.boardy1]==0)
-     cout<<"You have died take care"<<endl; keys[GLFW_KEY_Q]=1; return ;
+     { cout<<"You have died take care"<<endl; keys[GLFW_KEY_Q]=1; return ;}
    }
   if( level[game_level].board_light[player.boardx][player.boardy]==1 || level[game_level].board_light[player.boardx1][player.boardy1]==1)
   {
     if(player_sleep == standing)
-     cout<<"You have died take care you can only sleep on light tiles"<<endl; keys[GLFW_KEY_Q]=1; return ;
-   }
+    {
+       cout<<"You have died take care you can only sleep on light tiles"<<endl; keys[GLFW_KEY_Q]=1; return ;
+     }
+  }
   else if(player_sleep==standing && player.boardx==level[game_level].des.F && player.boardy==level[game_level].des.S) {game_level++;set_board();  init_player(); return ;}
   loop(i,0,level[game_level].hbridge.size())
   {

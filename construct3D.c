@@ -83,34 +83,41 @@ void construct(VAO x)
   else z_temp = game_board[player.boardx][player.boardy].z+game_board[player.boardx][player.boardy].dim[4]+4;
 
   glUseProgram (programID);
-  if(view_state==helicopter)
+  if(view_state==adventure)
   {
-    Matrices.view = glm::lookAt(glm::vec3(5*cos(helic.ang*M_PI/180)+x_temp,5*sin(helic.ang*M_PI/180)+y_temp,z_temp+7), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
-    Matrices.projection = glm::ortho(-25.0f*helic.dis, 25.0f*helic.dis,-25.0f*helic.dis,25.0f*helic.dis, -1.0f, 500.0f);
+    Matrices.view = glm::lookAt(glm::vec3(x_temp+2,y_temp,z_temp+5), glm::vec3(x_temp+adventure_radius*cos(adventure_angle*M_PI/180)*cos(adventure_angle_z*M_PI/180),y_temp+adventure_radius*sin(adventure_angle*M_PI/180)*cos(adventure_angle_z*M_PI/180),z_temp+adventure_radius*sin(adventure_angle_z*M_PI/180)), glm::vec3(0,0,1));
+    Matrices.projection = glm::perspective(1.57f,1.0f ,1.0f,500.0f);
+  }
+  else if(view_state==game_view)
+  {
+    Matrices.view = glm::lookAt(glm::vec3(5*cos(340*M_PI/180)+x_temp,5*sin(340*M_PI/180)+y_temp,z_temp+7), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
+    Matrices.projection = glm::ortho(-25.0f, 25.0f,-25.0f,25.0f, -1.0f, 500.0f);
   }
   else if(view_state==towerview)
   {
-
-    Matrices.view = glm::lookAt(glm::vec3(game_board[level[game_level].des.F][level[game_level].des.S].x,game_board[level[game_level].des.F][level[game_level].des.S].y,20), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
+    float a_temp = game_board[level[game_level].des.F][level[game_level].des.S].x;
+    float b_temp = game_board[level[game_level].des.F][level[game_level].des.S].y;
+    float c_temp = game_board[level[game_level].des.F][level[game_level].des.S].z;
+    Matrices.view = glm::lookAt(glm::vec3(a_temp,b_temp,20), glm::vec3(a_temp+tower_radius*cos(tower_angle*M_PI/180)*cos(tower_angle_z*M_PI/180),y_temp+tower_radius*sin(tower_angle*M_PI/180)*cos(tower_angle_z*M_PI/180),z_temp+tower_radius*sin(tower_angle_z*M_PI/180)), glm::vec3(0,0,1));
     Matrices.projection = glm::perspective(1.57f,1.0f,1.0f,50.0f);
   }
   else if(view_state==topview)
   {
-    Matrices.view = glm::lookAt(glm::vec3(1.5,1.5,11), glm::vec3(0,0,0), glm::vec3(0,0,1));
+    Matrices.view = glm::lookAt(glm::vec3(x_temp+1+top_x,y_temp+top_y,z_temp+20), glm::vec3(x_temp+top_x,y_temp+top_y,z_temp), glm::vec3(0,0,1));
     Matrices.projection = glm::ortho(-20.0f, 20.0f,-20.0f,20.0f, -500.0f, 500.0f);
   }
   else if(view_state==followup)
   {
-    if(player_state==xplus)
-      Matrices.view = glm::lookAt(glm::vec3(x_temp-1,y_temp,z_temp+1), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
-    else if (player_state==xminus)
-      Matrices.view = glm::lookAt(glm::vec3(x_temp+0.5,y_temp,z_temp+0.5), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
-    else if(player_state==yplus)
-      Matrices.view = glm::lookAt(glm::vec3(x_temp,y_temp-0.5,z_temp+0.5), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
-    else if(player_state==yminus)
-      Matrices.view = glm::lookAt(glm::vec3(x_temp,y_temp+0.5,z_temp+0.5), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
-
-    Matrices.projection = glm::ortho(-20.0f, 20.0f,-20.0f,20.0f, -500.0f, 500.0f);
+    float a_temp = x_temp;
+    float b_temp = y_temp;
+    float c_temp = z_temp;
+    Matrices.view = glm::lookAt(glm::vec3(5*cos(tower_angle*M_PI/180)+x_temp,5*sin(tower_angle*M_PI/180)+y_temp,z_temp+3), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
+    Matrices.projection = glm::ortho(-15.0f, 15.0f,-15.0f,15.0f, -1.0f, 500.0f);
+  }
+  else if (view_state == helicopter)
+  {
+    Matrices.view = glm::lookAt(glm::vec3(5*cos(helic.ang*M_PI/180)+x_temp,5*sin(helic.ang*M_PI/180)+y_temp,z_temp+7), glm::vec3(x_temp,y_temp,z_temp), glm::vec3(0,0,1));
+    Matrices.projection = glm::ortho(-25.0f*helic.dis, 25.0f*helic.dis,-25.0f*helic.dis,25.0f*helic.dis, -1.0f, 500.0f);
   }
   glm::mat4 VP = Matrices.projection * Matrices.view;
   glm::mat4 MVP;	// MVP = Projection * View * Model

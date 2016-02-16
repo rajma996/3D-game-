@@ -1,0 +1,29 @@
+try putting the player on the empty cell to complete the level
+
+first level is to get grip on the player position and movements 
+make sure you familiarisw your self with player movements to play smoothly further
+
+camera views
+
+press  shift + T for tower view
+press  shift + o for top view
+press  shift + A for adventure view
+press shift + f for follow cam view
+press shift + h for helipcopter view
+press shift + g for game view
+
+obstacles:
+
+press blue buttons vertically or horizontally to open a bridge
+press red buttions vertically to open  a bridge
+
+you can only stand vertical for pink tiles
+
+
+further controls 
+
+use arrow keys in different views to move camera positions
+
+YOU CAN ONLY PLAY IN GAME VIEW 
+
+use mouse in helicopter view for intuitive movement scroll for zooming in and out

@@ -12,6 +12,8 @@
 #define towerview 2
 #define topview 3
 #define followup 4
+#define adventure 5
+#define game_view 6
 #define xplus 1
 #define yplus 2
 #define xminus 3
@@ -39,8 +41,22 @@ typedef struct heli
 	float dis;
 }heli;
 heli helic;
+int adventure_radius;
+float adventure_angle;
+float adventure_angle_z;
+double mouse_x;
+double mouse_y;
+float tower_radius=5;
+float tower_angle;
+float tower_angle_z;
+
+float follow_radius=5;
+float follow_angle;
+float follow_angle_z;
+
 int view_state ;
 int game_level;
+int top_x,top_y;
 int player_state;
 int player_sleep = standing;
 struct VAO {
@@ -196,8 +212,8 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 						case GLFW_KEY_C:
 							keys[GLFW_KEY_C]=0;
 									break;
-            case GLFW_KEY_Y:
-                keys[GLFW_KEY_Y]=0;
+            case GLFW_KEY_G:
+                keys[GLFW_KEY_G]=0;
                 break;
             case GLFW_KEY_Z:
                 keys[GLFW_KEY_Z]=0;
@@ -205,18 +221,30 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 								else  helic.dis-=0.1;
                 break;
 						case GLFW_KEY_UP:
-								move_player_up();
+							keys[GLFW_KEY_UP]=0;
+								if(view_state == game_view)
+									move_player_up();
+								if(view_state == topview)
+									top_x--;
 								if(keys[GLFW_KEY_Q]==1) quit(window);
 								break;
 						case GLFW_KEY_DOWN:
+							keys[GLFW_KEY_DOWN]=0;
+							if(view_state == game_view)
 								move_player_down();
-								if(keys[GLFW_KEY_Q]==1) quit(window);
+									if(keys[GLFW_KEY_Q]==1) quit(window);
                 break;
 						case GLFW_KEY_LEFT:
+							keys[GLFW_KEY_LEFT]=0;
+							if(view_state == game_view)
 								move_player_left();
-								if(keys[GLFW_KEY_Q]==1) quit(window);
+							if(view_state == topview)
+									top_y--;
+							if(keys[GLFW_KEY_Q]==1) quit(window);
 								break;
 						case GLFW_KEY_RIGHT:
+							keys[GLFW_KEY_RIGHT]=0;
+							if(view_state == game_view)
 								move_player_right();
 								if(keys[GLFW_KEY_Q]==1) quit(window);
                 break;
@@ -239,10 +267,29 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 						case GLFW_KEY_Q:
 							keys[GLFW_KEY_Q]=1;
 							break;
+
+						case GLFW_KEY_UP:
+							keys[GLFW_KEY_UP]=1;
+							break;
+						case GLFW_KEY_DOWN:
+							keys[GLFW_KEY_DOWN]=1;
+							break;
+						case GLFW_KEY_RIGHT:
+							keys[GLFW_KEY_RIGHT]=1;
+							break;
+						case GLFW_KEY_LEFT:
+							keys[GLFW_KEY_LEFT]=1;
+							break;
+
+
 							case GLFW_KEY_H :
 								keys[GLFW_KEY_H]=1;
 								if(GLFW_KEY_LEFT_SHIFT) view_state = helicopter;
 								break;
+							case GLFW_KEY_A :
+								keys[GLFW_KEY_A]=1;
+								if(GLFW_KEY_LEFT_SHIFT) view_state = adventure;
+										break;
 							case GLFW_KEY_F:
 								keys[GLFW_KEY_F]=1;
 								if(GLFW_KEY_LEFT_SHIFT) view_state = followup;
@@ -258,15 +305,13 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
 							keys[GLFW_KEY_O]=1;
 							if(GLFW_KEY_LEFT_SHIFT) view_state = topview;
 							break;
-            case GLFW_KEY_Y:
-              keys[GLFW_KEY_Y]=1;
+            case GLFW_KEY_G:
+              keys[GLFW_KEY_G]=1;
+							if(GLFW_KEY_LEFT_SHIFT) view_state = game_view;
               break;
             case GLFW_KEY_Z:
               keys[GLFW_KEY_Z]=1;
               break;
-						case GLFW_KEY_A:
-							keys[GLFW_KEY_A]=1;
-									break;
 						case GLFW_KEY_B:
 							keys[GLFW_KEY_B]=1;
 									break;
@@ -336,7 +381,29 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
 		Matrices.projection = glm::ortho(-30.0f,30.0f,-30.0f,30.0f, 0.1f, 500.0f);
 }
 
+void checkkeys()
+{
+	if(keys[GLFW_KEY_LEFT] && view_state== adventure) adventure_angle++;
+	if(keys[GLFW_KEY_RIGHT] && view_state== adventure) adventure_angle--;
+	if(keys[GLFW_KEY_UP] && view_state== adventure) adventure_angle_z++;
+	if(keys[GLFW_KEY_DOWN] && view_state== adventure) adventure_angle_z--;
 
+	if(keys[GLFW_KEY_LEFT] && view_state== towerview) tower_angle++;
+	if(keys[GLFW_KEY_RIGHT] && view_state== towerview) tower_angle--;
+	if(keys[GLFW_KEY_UP] && view_state== towerview) tower_angle_z++;
+	if(keys[GLFW_KEY_DOWN] && view_state== towerview) tower_angle_z--;
+
+	if(keys[GLFW_KEY_LEFT] && view_state== topview) top_y++;
+	if(keys[GLFW_KEY_RIGHT] && view_state== topview) top_y--;;
+	if(keys[GLFW_KEY_UP] && view_state== topview) top_x--;
+	if(keys[GLFW_KEY_DOWN] && view_state== topview) top_x++;
+
+	if(keys[GLFW_KEY_LEFT] && view_state== followup) tower_angle++;
+	if(keys[GLFW_KEY_RIGHT] && view_state== followup) tower_angle--;
+	if(keys[GLFW_KEY_UP] && view_state== followup) tower_angle_z++;
+	if(keys[GLFW_KEY_DOWN] && view_state== followup) tower_angle_z--;
+
+}
 // Creates the triangle object used in this sample code
 void draw ()
 {
@@ -371,8 +438,29 @@ void draw ()
 	display_board();
 	display_player();
 	construct(water);
+	checkkeys();
+	// change_tiles();
+	// set_alllines();
   // Load identity to model matrix
   // draw3DObject draws the VAO given to it using current MVP matrix
+}
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	if(yoffset>0) helic.dis+=0.1;
+	else helic.dis-=0.1;
+}
+static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	float x_temp = (game_board[player.boardx][player.boardy].x+game_board[player.boardx1][player.boardy1].x)/2;
+	float y_temp = (game_board[player.boardx][player.boardy].y+game_board[player.boardx1][player.boardy1].y)/2;
+	ypos*=-1;
+	// xpos-=700;
+	ypos+=700;
+	xpos-=350; ypos-=350;
+	// printf("%f %f\n",x_temp,y_temp );
+	// printf("%f %f\n",xpos,ypos );
+	if(xpos>0) helic.ang++;
+	if(xpos<0) { helic.ang--; }
 }
 
 /* Initialise glfw window, I/O callbacks and the renderer to use */
@@ -416,9 +504,12 @@ GLFWwindow* initGLFW (int width, int height)
     /* Register function to handle keyboard input */
     glfwSetKeyCallback(window, keyboard);      // general keyboard input
     glfwSetCharCallback(window, keyboardChar);  // simpler specific character handling
-
+		glfwSetScrollCallback(window, scroll_callback);
+		glfwGetCursorPos(window, &mouse_x, &mouse_y);
     /* Register function to handle mouse click */
     glfwSetMouseButtonCallback(window, mouseButton);  // mouse button clicks
+		glfwSetCursorPosCallback(window, cursor_pos_callback);
+
 
     return window;
 }
@@ -430,11 +521,23 @@ void initGL (GLFWwindow* window, int width, int height)
     /* Objects should be created before any other gl function and shaders */
 	// Create the models
 	// Create and compile our GLSL program from the shaders
-	game_level = 5;
+	game_level = 0;
 	set_levels();
 	set_board();
 	init_player();
-	view_state = helicopter;
+	top_x=0; top_y=0;
+	view_state = game_view;
+	adventure_radius = 5;
+	adventure_angle = 0;
+	adventure_angle_z=0;
+	tower_radius = 5;
+	tower_angle = 0;
+	tower_angle_z=0;
+
+	follow_radius = 5;
+	follow_angle = 0;
+	follow_angle_z=0;
+
 	player_state = xplus;
 	helic.ang = 340;
 	helic.dis = 1;

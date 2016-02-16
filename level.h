@@ -13,6 +13,7 @@ struct level_struct
   vector<VAO> hbridge_vao;
   vector<VAO> vbridge_vao;
  bool board_light[50][50];
+ vector<pair<int,int> > up_tiles;
 };
 
 struct level_struct level[20];

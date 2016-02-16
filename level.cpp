@@ -2,6 +2,9 @@
 
 void set_levels()
 {
+  loop(i,1,11)  loop(j,1,11) level[0].board[i][j]=1;
+  level[0].start = MP(3,3);
+  level[0].des = MP(8,8);
   loop(i,0,50) loop(j,0,50) level[1].board[i][j]=0;
   loop(i,0,50) loop(j,0,50) level[2].board[i][j]=0;
   loop(i,1,4) level[1].board[1][i]=1;
